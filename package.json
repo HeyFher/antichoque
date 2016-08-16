@@ -1,0 +1,11 @@
+{
+  "name": "antichoque",
+  "version": "0.0.1",
+  "description": "Sistema de navegacion para automoviles",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

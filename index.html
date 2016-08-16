@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <!-- for ios 7 style, multi-resolution icon of 152x152 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-barstyle" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon-152.png">
+    <!-- for Chrome on Android, multi-resolution icon of 196x196 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Antichoque</title>
+</head>
+
+<body>
+    <!-- Stylesheet -->
+    <style media="screen">
+        @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,700);
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .page {
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(to top right, #1b1b1f, #4a458a)
+        }
+
+        .road {
+            border-left: 2px solid rgb(194, 202, 217);
+            border-right: 2px solid rgb(194, 202, 217);
+            height: 455px;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .road::before {
+            content: attr(data-distance);
+            position: absolute;
+            color: #cdcfdf;
+            font-family: 'Source Sans Pro';
+            font-size: 5rem;
+            font-weight: 700;
+            top: -300px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .collision-car,
+        .own-car {
+            transform: rotate(270deg);
+            transition: all 0.2s;
+        }
+
+        .own-car {
+            margin-top: auto;
+        }
+
+        .collision-car {
+            opacity: 0;
+        }
+
+        .controlls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+        }
+
+        .controlls .rotate-x {
+            width: 250px;
+        }
+    </style>
+
+
+    <!-- Layout -->
+    <main class="page">
+        <div class="controlls">
+            <input class="rotate-x" type="range" min="0" max="50" value="0">
+        </div>
+        <div class="road">
+            <div class="collision-car">
+                <img src="http://www.clipartkid.com/images/131/red-car-top-view-clip-art-at-clker-com-vector-clip-art-online-uMii2W-clipart.png" height="100" width="200">
+            </div>
+            <div class="own-car">
+                <img src="http://www.clker.com/cliparts/q/0/m/g/P/c/red-sports-car-top-view-md.png" height="100" width="200">
+            </div>
+        </div>
+    </main>
+
+
+    <!-- Javascript -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://192.168.1.68');
+
+        var collisionCar = document.querySelector('.collision-car');
+        var road = document.querySelector('.road');
+        var rotateX = document.querySelector('.rotate-x');
+
+        rotateX.oninput = function() {
+            road.style.transform = `perspective(600px) rotateX(${this.value}deg)`;
+        }
+
+        socket.on('distanceData', function(data) {
+            var distance = parseInt(data);
+            if (distance) {
+                collisionCar.style.transform = `translateY(${-distance + 152}px) rotate(270deg)`;
+                road.setAttribute('data-distance', `${distance}`);
+                if (distance > 300) {
+                    road.setAttribute('data-distance', ``);
+                    collisionCar.style.opacity = '0';
+                } else {
+                    collisionCar.style.opacity = '1';
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
